@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name buildingBuilder
+// @name buildingBuilder_v0.9
 // @author Rodrygors
 // @version 0.9
 // @grant Publico
