@@ -23,7 +23,7 @@
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = false; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
-const builderActive = true;
+const builderActive = false;
 const quickFinishActive = true;
 const questFinisherActive = true; //NOT WORKING ATM
 const delayRefreshPaginaMin = 60000; // EXEMPLOS: 60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
@@ -161,7 +161,7 @@ function getRefreshDelay(lastLoadTime, nextBuildFinishTime) {
     var nextBuildFinishTimeMs = parseFromStringToMs(nextBuildFinishTime);
 
     if(lastLoadTimeMs > nextBuildFinishTimeMs) {
-        nextBuildFinishTimeMs += parseFromStringToMs("25:59:59");
+        nextBuildFinishTimeMs += parseFromStringToMs("23:59:59");
         //take 3 minutes from refresh timer to user quick completion
         return nextBuildFinishTimeMs - lastLoadTimeMs - 180000;
     }
