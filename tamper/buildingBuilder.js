@@ -74,7 +74,7 @@ function clickButton(buttonList, BtnLabel) {
 
             if(BtnLabel == completeBuildingBtnLabel) {
                 console.log("refreshing to check for other free completes");
-                refresh();
+                setTimeout(function(){refresh();},safetyRefreshBuffer);
             }
 		}
 		else {
