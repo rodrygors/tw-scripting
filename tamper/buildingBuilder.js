@@ -28,26 +28,20 @@ const questCompleteBtnLabel = 'quest-complete-btn';
 var delayRefreshPagina = Math.floor((Math.random() * delayRefreshPaginaMin) + delayRefreshPaginaMax); // ms
 
 window.addEventListener('load', function() {
-	refreshNext = false;
+	var refreshNext = false;
 
     var buildingButtonList = document.getElementsByClassName(buildingQuestBtnLabel);
-    if(buildingButtonList.length > 0) {
-		refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel || refreshNext);
-	}
+    refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel || refreshNext);
 
     setTimeout(function(){},delayBetweenActions);
 
     var completeBuildingButtonList = document.getElementsByClassName(completeBuildingBtnLabel);
-    if(completeBuildingButtonList.length > 0) {
-		refreshNext = clickButton(completeBuildingButtonList, buildingQuestBtnLabel || refreshNext);
-	}
+    refreshNext = clickButton(completeBuildingButtonList, completeBuildingBtnLabel || refreshNext);
 
     setTimeout(function(){},delayBetweenActions);
 
     var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
-    if(completeQuestButtonList.length > 0) {
-		refreshNext = clickButton(completeQuestButtonList, buildingQuestBtnLabel || refreshNext);
-	}
+    refreshNext = clickButton(completeQuestButtonList, questCompleteBtnLabel || refreshNext);
 
     console.log("done.\nrefreshing: " + refreshNext);
     setTimeout(function(){refresh();},refreshNext ? safetyRefreshBuffer : delayRefreshPagina);
@@ -67,8 +61,8 @@ function refresh() {
 }
 
 function clickButton(buttonList, BtnLabel) {
-	refreshNext = false;
-	
+	var refreshNext = false;
+
     if(buttonList.length == 0) {
         console.log("No buttons found for " + BtnLabel);
         return;
@@ -86,7 +80,7 @@ function clickButton(buttonList, BtnLabel) {
             if(BtnLabel == completeBuildingBtnLabel) {
                 console.log("refreshing to check for other free completes");
 				refreshNext = true;
-				
+
             }
 		}
 		else {
