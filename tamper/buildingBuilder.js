@@ -135,9 +135,9 @@ function countDown(mensagemErro, delay){
 
 function parseDelayRefreshPagina(delayRefreshPagina){
     if ( delayRefreshPagina <= 60000 ){
-        return (parseInt(delayRefreshPagina / 1000) + " segundos");
+        return (parseInt(delayRefreshPagina / 1000) + " seconds");
     }
-    else return (parseInt(delayRefreshPagina / 60000) + " minutos e " + parseDelayRefreshPagina(delayRefreshPagina % 60000));
+    else return (parseInt(delayRefreshPagina / 60000) + " minutes and " + parseDelayRefreshPagina(delayRefreshPagina % 60000));
 }
 
 function parseTimeFromPM([timeTrim, suff]) {
