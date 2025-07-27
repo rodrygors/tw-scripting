@@ -14,22 +14,35 @@
 const alternarAldeia = 0; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
 const delayRefreshPaginaMin =  60000; // EXEMPLOS: 60000 1 min || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 const delayRefreshPaginaMax = 120000; // EXEMPLOS:  60000 1 min || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
+const delayBetweenActions = 1000 // // EXEMPLOS:  1000 1 sec
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
 const safetyRefreshBuffer = 2000;
 
 var delayRefreshPagina = Math.floor((Math.random() * delayRefreshPaginaMin) + delayRefreshPaginaMax); // ms
 
 window.addEventListener('load', function() {
-    var buildingButtonList = document.getElementsByClassName('current-quest');
-    var completeBuildingButtonList = document.getElementsByClassName('btn-instant-free');
-    var completeQuestButtonList = document.getElementsByClassName('quest-complete-btn');
 
+    var buildingButtonList = document.getElementsByClassName('current-quest');
     if(buildingButtonList.length > 0) clickButton(buildingButtonList);
+
+    setTimeout(function(){},delayBetweenActions);
+
+    var completeBuildingButtonList = document.getElementsByClassName('btn-instant-free');
     if(buildingButtonList.length > 0) clickButton(completeBuildingButtonList);
+
+    setTimeout(function(){},delayBetweenActions);
+
+    var completeQuestButtonList = document.getElementsByClassName('quest-complete-btn');
     if(buildingButtonList.length > 0) clickButton(completeQuestButtonList);
 
     console.log("done: ");
     setTimeout(function(){refresh();},delayRefreshPagina);
+
+}, false);
+
+
+window.addEventListener('showDialog', function() {
+    console.log("OLAAAA");
 
 }, false);
 
@@ -50,10 +63,10 @@ function clickButton(buttonList) {
 	console.log(buttonList);
 
 	for (var i = 0; i < buttonList.length; i++) {
-		if (!buttonList[i].style[i] == "display") {
-			buttonList[i].childNodes[0].click();
-			console.log("clicked button:" + buttonList[i].childNodes[0].click());
-			console.log(buttonList[i].childNodes[0].click());
+		if (buttonList[i].style[0] == undefined) {
+			buttonList[i].click();
+			console.log("clicked button:");
+			console.log(buttonList[i]);
 			console.log($('#main_buildlink_main_8'));
 		}
 		else {
