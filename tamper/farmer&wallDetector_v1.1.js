@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name farmer&wallDetector
 // @author Rodrygors
-// @version 1.0
+// @version 1.1
 // @grant Publico
 // @description Script que envia quantiade de tropas diferentes para farms cheios, vazios e com ou sem muralha. Discord: Rodrygors#5516
 // @match https://*/*screen=am_farm*
@@ -22,20 +22,22 @@
 // ---> Utilizar o checkWalls() para verificar e/ou guardar coords no localStorage <---
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
-const alternarAldeia = 1; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
+const alternarAldeia = 0; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
 const delayClickMinimo = 300; // ms
 const delayClickMaximo = 500; // ms
 const delayRefreshPagina = 300000; // EXEMPLOS: 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 //DEFINIÇÕES DE ENVIO DE ATAQUES:
-const isFullSend = 0; // 1 = Caso não tenha tropas para atacar com um modelo, tenta usar o outro.
+const isFullSend = 1; // 1 = Caso não tenha tropas para atacar com um modelo, tenta usar o outro.
 const activateModelCDistance = 0; // Distância a que o script vai tentar enviar ataques com o modelo C, ter em atenção que unidades estão selecionadas (difinir 0 para desativar modelo C)
 //DEFINIÇÕES DO DETETOR DE MURALHA:
-const maxWallLevel = 1; //Nivel máximo de muralha até ao qual é para atacar (definir como 20 para atacar todas)
+const maxWallLevel = 0; //Nivel máximo de muralha até ao qual é para atacar (definir como 20 para atacar todas)
 const maxWalledVillageDistance = 18; // Distância a partir da qual aldeias com muralha acima do nivel estipulado são apagadas do assistente (definir como 0 para apagar todas)
 //OUTRAS DEFINIÇÕES:
 const saveinfoToLS = 1; // 1 = Guarda informação no LocalStorage para ser utilizado por outros scripts (até agora guarda as coordenadas das aldeias não atacadas por terem muralha para serem usadas num script de praça de reunião)
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
 const safetyRefreshBuffer = 2000;
+const PARTIAL_PLUNDER = "Saque parcial: os seus soldados saquearam tudo que encontraram.";
+const FULL_PLUNDER = "Saque completo: os seus soldados saquearam tudo que conseguiam carregar."
 var plunderList = [];
 var visIndexModel = 0;
 var lastLoadedMS = Date.now();
@@ -92,8 +94,24 @@ function checkTroops(typeOfAttack){
     var currentKnight = parseInt(document.getElementById("knight").lastChild.textContent);
 
 
-    if(typeOfAttack=='A') return (modelSpearA <= currentSpear && modelSwordA <= currentSword && modelAxeA <= currentAxe && modelScoutA <= currentScout && modelLightA <= currentLight && modelHeavyA <= currentHeavy && modelKnightA <= currentKnight);
-    else if(typeOfAttack=='B') return (modelSpearB <= currentSpear && modelSwordB <= currentSword && modelAxeB <= currentAxe && modelScoutB <= currentScout && modelLightB <= currentLight && modelHeavyB <= currentHeavy && modelKnightB <= currentKnight);
+    if(typeOfAttack=='A') {
+        return (modelSpearA <= currentSpear &&
+                modelSwordA <= currentSword &&
+                modelAxeA <= currentAxe &&
+                modelScoutA <= currentScout &&
+                modelLightA <= currentLight &&
+                modelHeavyA <= currentHeavy &&
+                modelKnightA <= currentKnight);
+    }
+    else if(typeOfAttack=='B') {
+        return (modelSpearB <= currentSpear &&
+                modelSwordB <= currentSword &&
+                modelAxeB <= currentAxe &&
+                modelScoutB <= currentScout &&
+                modelLightB <= currentLight &&
+                modelHeavyB <= currentHeavy &&
+                modelKnightB <= currentKnight);
+    }
 }
 
 function checkWalls(prevPlunderWallLevel, prevPlunderDistance, clickIndex, coords){
@@ -168,9 +186,10 @@ function sendAttacks()
             var prevPlunderDistance = plunderList[clickIndex].children[7].textContent;
             try {
                 var prevPlunderStatus = plunderList[clickIndex].children[2].children[0].attributes["data-title"].value;
+                console.log("prev plunder " + prevPlunderStatus);
             }
             catch{
-                prevPlunderStatus = "Saque parcial: os seus soldados saquearam tudo que encontraram."; //Caso relatório não tenha saque
+                prevPlunderStatus = PARTIAL_PLUNDER; //Caso relatório não tenha saque
             }
 
             var coords = plunderList[clickIndex].children[3].innerText.slice(0, -3).replace("(", "").replace(")", "").replace(" ", "");
@@ -195,12 +214,12 @@ function sendAttacks()
             //console.log(prevPlunderWallLevel + " > " + maxWallLevel + '?');
             console.log(prevPlunderStatus);
 
-            if (statusModelA && prevPlunderStatus == "Saque parcial: os seus soldados saquearam tudo que encontraram."){ //caso o saque não venha cheio e o modelo A tenha tropas
+            if (statusModelA && prevPlunderStatus == PARTIAL_PLUNDER){ //caso o saque não venha cheio e o modelo A tenha tropas
                 plunderList[clickIndex].children[8].children[0].click(); //click A
                 console.log('Ataque: A | Aldeia: ' + coords);
                 UI.SuccessMessage(coords + " -> A");
             }
-            else if( statusModelB && prevPlunderStatus == "Saque completo: os seus soldados saquearam tudo que conseguiam carregar.") { //Caso modelo B tenha tropas e o saque tenha vindo cheio o
+            else if( statusModelB && prevPlunderStatus == FULL_PLUNDER) { //Caso modelo B tenha tropas e o saque tenha vindo cheio o
                 plunderList[clickIndex].children[9].children[0].click(); //click B
                 UI.SuccessMessage(coords + " -> B");
                 console.log('Ataque: B | Aldeia: ' + coords);
