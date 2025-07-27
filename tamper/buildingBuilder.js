@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name buildingBuilder
 // @author Rodrygors
-// @version 0.9.1
+// @version 0.9.2
 // @grant Publico
 // @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões do pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
@@ -14,6 +14,8 @@
 //Basic functionality working
 //27/07/25 -> v0.9.1
 //Auto refresh to handle multiple order completes
+//27/07/25 -> v0.9.2
+//Added UI refresh timer
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = 0; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
@@ -22,6 +24,7 @@ const delayRefreshPaginaMax = 90000; // EXEMPLOS:  60000 1 min || 90000 = 1.5 mi
 const delayBetweenActions = 1000 // // EXEMPLOS:  1000 1 sec
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
 const safetyRefreshBuffer = 2000;
+const lastLoadedMS = Date.now();
 
 const buildingQuestBtnLabel = 'current-quest';
 const completeBuildingBtnLabel = 'btn-instant-free';
@@ -47,6 +50,7 @@ window.addEventListener('load', function() {
 
     console.log("done.\nrefreshing: " + refreshNext);
     setTimeout(function(){refresh();},refreshNext ? safetyRefreshBuffer : delayRefreshPagina);
+    countDown("Refreshing in:", refreshNext ? safetyRefreshBuffer : delayRefreshPagina);
 
 }, false);
 
@@ -92,4 +96,17 @@ function clickButton(buttonList, BtnLabel) {
 	}
     console.log("no more " + BtnLabel + "\nrefreshing next: " + refreshNext);
 	return refreshNext;
+}
+
+function countDown(mensagemErro, delay){
+    setInterval(function(){
+        UI.ErrorMessage(mensagemErro + "\n(" + parseDelayRefreshPagina(delayRefreshPagina - (Date.now() - lastLoadedMS - safetyRefreshBuffer)) + ")", 950);
+    }, 1000);
+}
+
+function parseDelayRefreshPagina(delayRefreshPagina){
+    if ( delayRefreshPagina <= 60000 ){
+        return (parseInt(delayRefreshPagina / 1000) + " segundos");
+    }
+    else return (parseInt(delayRefreshPagina / 60000) + " minutos e " + parseDelayRefreshPagina(delayRefreshPagina % 60000));
 }
