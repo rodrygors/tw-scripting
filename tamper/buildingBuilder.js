@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name buildingBuilder
 // @author Rodrygors
-// @version 0.9.3
+// @version 0.9.4
 // @grant Publico
 // @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões do pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
@@ -18,9 +18,14 @@
 //Added UI refresh timer
 //27/07/25 -> v0.9.3
 //Added smart refresh timer to refresh based on time loeft to quick build
+//27/07/25 -> v0.9.4
+//Added flags to enable / disable features
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
-const alternarAldeia = 0; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
+const alternarAldeia = false; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
+const builderActive = true;
+const quickFinishActive = true;
+const questFinisherActive = true; //NOT WORKING ATM
 const delayRefreshPaginaMin = 60000; // EXEMPLOS: 60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 const delayRefreshPaginaMax = 90000; // EXEMPLOS:  60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 const delayBetweenActions = 1000 // // EXEMPLOS:  1000 1 sec
@@ -35,23 +40,9 @@ const questCompleteBtnLabel = 'quest-complete-btn';
 var delayRefreshPagina = Math.floor((Math.random() * (delayRefreshPaginaMax - delayRefreshPaginaMin)) + delayRefreshPaginaMin); // ms
 
 window.addEventListener('load', function() {
-	var refreshNext = false;
     console.log("refresh delay: " + delayRefreshPagina);
 
-    var buildingButtonList = document.getElementsByClassName(buildingQuestBtnLabel);
-    refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel) || refreshNext;
-
-    setTimeout(function(){},delayBetweenActions);
-
-    var completeBuildingButtonList = document.getElementsByClassName(completeBuildingBtnLabel);
-    refreshNext = clickButton(completeBuildingButtonList, completeBuildingBtnLabel) || refreshNext;
-
-    setTimeout(function(){},delayBetweenActions);
-
-    var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
-    refreshNext = clickButton(completeQuestButtonList, questCompleteBtnLabel) || refreshNext;
-
-    console.log("done.\nrefreshing now: " + refreshNext);
+    var refreshNext = fetchAndClick();
 
     var nextOrderCompletionTime = "";
     try{
@@ -72,7 +63,7 @@ window.addEventListener('load', function() {
 }, false);
 
 function refresh() {
-    if ( alternarAldeia == 0 ) location.reload();
+    if ( alternarAldeia ) location.reload();
     else {
         $('.groupRight').click();
         $('.arrowRight').click();
@@ -81,6 +72,28 @@ function refresh() {
         setTimeout(function(){location.reload();}, safetyRefreshBuffer);
         }
     }
+}
+
+function fetchAndClick() {
+    var refreshNext = false;
+
+    if(builderActive) {
+        var buildingButtonList = document.getElementsByClassName(buildingQuestBtnLabel);
+        refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel) || refreshNext;
+        setTimeout(function(){},delayBetweenActions);
+    }
+    if(quickFinishActive) {
+        var completeBuildingButtonList = document.getElementsByClassName(completeBuildingBtnLabel);
+        refreshNext = clickButton(completeBuildingButtonList, completeBuildingBtnLabel) || refreshNext;
+        setTimeout(function(){},delayBetweenActions);
+    }
+    if(questFinisherActive) {
+        var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
+        refreshNext = clickButton(completeQuestButtonList, questCompleteBtnLabel) || refreshNext;
+    }
+
+    console.log("done.\nrefreshing now: " + refreshNext);
+    return refreshNext;
 }
 
 function clickButton(buttonList, BtnLabel) {
