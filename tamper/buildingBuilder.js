@@ -41,12 +41,6 @@ window.addEventListener('load', function() {
 
 }, false);
 
-
-window.addEventListener('showDialog', function() {
-    console.log("OLAAAA");
-
-}, false);
-
 function refresh() {
     if ( alternarAldeia == 0 ) location.reload();
     else {
