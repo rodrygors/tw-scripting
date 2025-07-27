@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name buildingBuilder
 // @author Rodrygors
-// @version 0.1
+// @version 0.2
 // @grant Publico
 // @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões do pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
