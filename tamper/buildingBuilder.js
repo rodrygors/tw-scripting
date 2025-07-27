@@ -12,7 +12,7 @@
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = 0; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
-const delayRefreshPaginaMin =  60000; // EXEMPLOS: 60000 1 min || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins 
+const delayRefreshPaginaMin =  60000; // EXEMPLOS: 60000 1 min || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 const delayRefreshPaginaMax = 120000; // EXEMPLOS:  60000 1 min || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
 const safetyRefreshBuffer = 2000;
@@ -20,14 +20,14 @@ const safetyRefreshBuffer = 2000;
 var delayRefreshPagina = Math.floor((Math.random() * delayRefreshPaginaMin) + delayRefreshPaginaMax); // ms
 
 window.addEventListener('load', function() {
-    buildingButtonList = document.getElementsByClassName("current-quest");
-    completeBuildingButtonList = document.getElementsByClassName("btn-instant-free");
-    completeQuestButtonList = document.getElementsByClassName("quest-complete-btn");
-	
+    var buildingButtonList = document.getElementsByClassName("current-quest");
+    var completeBuildingButtonList = document.getElementsByClassName("btn-instant-free");
+    var completeQuestButtonList = document.getElementsByClassName("quest-complete-btn");
+
     if(buildingButtonList.length > 0) clickButton(buildingButtonList);
     if(buildingButtonList.length > 0) clickButton(completeBuildingButtonList);
     if(buildingButtonList.length > 0) clickButton(completeQuestButtonList);
-	
+
     console.log("done: ");
     setTimeout(function(){refresh();},delayRefreshPagina);
 
@@ -46,9 +46,11 @@ function refresh() {
 }
 
 function clickButton(buttonList) {
+	console.log("button list: ");
 	console.log(buttonList);
-	for (i = 0; i < buttonList.length; i++) {
-		if (!buttonList[i].style[0] == "display") {
+
+	for (var i = 0; i < buttonList.length; i++) {
+		if (!buttonList[i].style[i] == "display") {
 			buttonList[i].click();
 			console.log("clicked button:" + buttonList[i]);
 		}
