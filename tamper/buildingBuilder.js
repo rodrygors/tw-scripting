@@ -67,10 +67,15 @@ function clickButton(buttonList, BtnLabel) {
 	console.log(buttonList);
 
 	for (var i = 0; i < buttonList.length; i++) {
-		if (buttonList[i].style[0] == undefined) {
+		if(buttonList[i].style[0] == undefined) {
 			buttonList[i].click();
 			console.log("clicked button:");
 			console.log(buttonList[i]);
+
+            if(BtnLabel == completeBuildingBtnLabel) {
+                console.log("refreshing to check for other free completes");
+                refresh();
+            }
 		}
 		else {
 			console.log("inactive button:" + buttonList[i]);
