@@ -8,7 +8,8 @@
 // ==/UserScript==
 //******************************* READ ME: *******************************
 //******************************* Dev Notes: *******************************
-//27/07/25 -> v0.1
+//27/07/25 -> v0.3
+//Quest completer not yet online
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = 0; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
