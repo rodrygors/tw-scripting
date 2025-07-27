@@ -36,17 +36,17 @@ window.addEventListener('load', function() {
 	var refreshNext = false;
 
     var buildingButtonList = document.getElementsByClassName(buildingQuestBtnLabel);
-    refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel || refreshNext);
+    refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel) || refreshNext;
 
     setTimeout(function(){},delayBetweenActions);
 
     var completeBuildingButtonList = document.getElementsByClassName(completeBuildingBtnLabel);
-    refreshNext = clickButton(completeBuildingButtonList, completeBuildingBtnLabel || refreshNext);
+    refreshNext = clickButton(completeBuildingButtonList, completeBuildingBtnLabel) || refreshNext;
 
     setTimeout(function(){},delayBetweenActions);
 
     var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
-    refreshNext = clickButton(completeQuestButtonList, questCompleteBtnLabel || refreshNext);
+    refreshNext = clickButton(completeQuestButtonList, questCompleteBtnLabel) || refreshNext;
 
     console.log("done.\nrefreshing: " + refreshNext);
     setTimeout(function(){refresh();},refreshNext ? safetyRefreshBuffer : delayRefreshPagina);
