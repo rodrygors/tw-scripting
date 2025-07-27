@@ -47,7 +47,8 @@ window.addEventListener('load', function() {
     plunderList = document.getElementById("plunder_list").children[0].children;
     if(document.getElementsByClassName("vis")[0].children.length != 2) visIndexModel = 1;
     sendAttacks();
-    console.log("plunderList: " + plunderList);
+    console.log("plunderList:");
+    console.log(plunderList);
     setTimeout(function(){refresh();},delayRefreshPagina);
 
 }, false);
