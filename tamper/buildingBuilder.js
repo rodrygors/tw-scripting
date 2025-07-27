@@ -30,10 +30,11 @@ const buildingQuestBtnLabel = 'current-quest';
 const completeBuildingBtnLabel = 'btn-instant-free';
 const questCompleteBtnLabel = 'quest-complete-btn';
 
-var delayRefreshPagina = Math.floor((Math.random() * delayRefreshPaginaMin) + delayRefreshPaginaMax); // ms
+var delayRefreshPagina = Math.floor((Math.random() * (delayRefreshPaginaMax - delayRefreshPaginaMin)) + delayRefreshPaginaMin); // ms
 
 window.addEventListener('load', function() {
 	var refreshNext = false;
+    console.log("refresh delay: " + delayRefreshPagina);
 
     var buildingButtonList = document.getElementsByClassName(buildingQuestBtnLabel);
     refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel) || refreshNext;
