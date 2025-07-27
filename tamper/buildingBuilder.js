@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name buildingBuilder
 // @author Rodrygors
-// @version 0.2
+// @version 0.1
 // @grant Publico
 // @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões do pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
@@ -20,9 +20,9 @@ const safetyRefreshBuffer = 2000;
 var delayRefreshPagina = Math.floor((Math.random() * delayRefreshPaginaMin) + delayRefreshPaginaMax); // ms
 
 window.addEventListener('load', function() {
-    var buildingButtonList = document.getElementsByClassName("current-quest");
-    var completeBuildingButtonList = document.getElementsByClassName("btn-instant-free");
-    var completeQuestButtonList = document.getElementsByClassName("quest-complete-btn");
+    var buildingButtonList = document.getElementsByClassName('current-quest');
+    var completeBuildingButtonList = document.getElementsByClassName('btn-instant-free');
+    var completeQuestButtonList = document.getElementsByClassName('quest-complete-btn');
 
     if(buildingButtonList.length > 0) clickButton(buildingButtonList);
     if(buildingButtonList.length > 0) clickButton(completeBuildingButtonList);
@@ -51,11 +51,14 @@ function clickButton(buttonList) {
 
 	for (var i = 0; i < buttonList.length; i++) {
 		if (!buttonList[i].style[i] == "display") {
-			buttonList[i].click();
-			console.log("clicked button:" + buttonList[i]);
+			buttonList[i].childNodes[0].click();
+			console.log("clicked button:" + buttonList[i].childNodes[0].click());
+			console.log(buttonList[i].childNodes[0].click());
+			console.log($('#main_buildlink_main_8'));
 		}
 		else {
 			console.log("inactive button:" + buttonList[i]);
+			console.log($('#main_buildlink_main_8'));
 		}
 	}
 }
