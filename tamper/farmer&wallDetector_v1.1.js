@@ -18,6 +18,8 @@
 //   - Guarda no localStorage as coords para as aldeias com muralhas que serão usadas num script de praça (Para obter as coordenadas em memória: window.localStorage.getItem('villagesToBeWalled'))
 //07/12/22 -> patch
 //   - Bug em que o script fica preso devido a grupo não ter mais aldeias ou a aldeia não estar no grupo selecionado resolvido.
+//11/12/22 -> TODO:
+// ---> Utilizar o checkWalls() para verificar e/ou guardar coords no localStorage <---
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = 1; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
