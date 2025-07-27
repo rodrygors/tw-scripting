@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name buildingBuilder
 // @author Rodrygors
-// @version 0.9.2
+// @version 0.9.3
 // @grant Publico
 // @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões do pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
@@ -16,6 +16,8 @@
 //Auto refresh to handle multiple order completes
 //27/07/25 -> v0.9.2
 //Added UI refresh timer
+//27/07/25 -> v0.9.3
+//Added smart refresh timer to refresh based on time loeft to quick build
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = 0; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
@@ -49,9 +51,23 @@ window.addEventListener('load', function() {
     var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
     refreshNext = clickButton(completeQuestButtonList, questCompleteBtnLabel) || refreshNext;
 
-    console.log("done.\nrefreshing: " + refreshNext);
-    setTimeout(function(){refresh();},refreshNext ? safetyRefreshBuffer : delayRefreshPagina);
-    countDown("Refreshing in:", refreshNext ? safetyRefreshBuffer : delayRefreshPagina);
+    console.log("done.\nrefreshing now: " + refreshNext);
+
+    var nextOrderCompletionTime = "";
+    try{
+        console.log(document.getElementById('buildqueue').children[1].children[3].textContent);
+        nextOrderCompletionTime = document.getElementById('buildqueue').children[1].children[3].textContent.split(" ")[2];
+    }
+    catch{
+    }
+
+    var lastLoadTimeString = parseTimeFromPM(new Date(lastLoadedMS).toLocaleTimeString().split(" ").map(String));
+
+    var refreshDelay = getRefreshDelay(lastLoadTimeString, nextOrderCompletionTime);
+    console.log("Refresh timer:", parseDelayRefreshPagina(refreshDelay));
+
+    setTimeout(function(){refresh();},refreshNext ? safetyRefreshBuffer : refreshDelay);
+    countDown("Refreshing in:", refreshNext ? safetyRefreshBuffer : refreshDelay);
 
 }, false);
 
@@ -87,7 +103,6 @@ function clickButton(buttonList, BtnLabel) {
             if(BtnLabel == completeBuildingBtnLabel) {
                 console.log("refreshing to check for other free completes");
 				refreshNext = true;
-
             }
 		}
 		else {
@@ -101,7 +116,7 @@ function clickButton(buttonList, BtnLabel) {
 
 function countDown(mensagemErro, delay){
     setInterval(function(){
-        UI.ErrorMessage(mensagemErro + "\n(" + parseDelayRefreshPagina(delayRefreshPagina - (Date.now() - lastLoadedMS - safetyRefreshBuffer)) + ")", 950);
+        UI.ErrorMessage(mensagemErro + "\n(" + parseDelayRefreshPagina(delay - (Date.now() - lastLoadedMS - safetyRefreshBuffer)) + ")", 950);
     }, 1000);
 }
 
@@ -110,4 +125,33 @@ function parseDelayRefreshPagina(delayRefreshPagina){
         return (parseInt(delayRefreshPagina / 1000) + " segundos");
     }
     else return (parseInt(delayRefreshPagina / 60000) + " minutos e " + parseDelayRefreshPagina(delayRefreshPagina % 60000));
+}
+
+function parseTimeFromPM([timeTrim, suff]) {
+    const [hours, minutes, seconds] = timeTrim.split(":").map(String);
+
+    var pmHours = (parseInt(hours) + 12).toString();
+
+    if (suff == "PM") return pmHours + ":" + minutes + ":" + seconds;
+    else return hours + ":" + minutes + ":" + seconds;
+}
+
+function parseFromStringToMs(time){
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    return (hours * 3600 + minutes * 60 + seconds) * 1000;
+}
+
+function getRefreshDelay(lastLoadTime, nextBuildFinishTime) {
+    if (nextBuildFinishTime == "") return delayRefreshPagina;
+
+    var lastLoadTimeMs = parseFromStringToMs(lastLoadTime);
+    var nextBuildFinishTimeMs = parseFromStringToMs(nextBuildFinishTime);
+
+    if(lastLoadTimeMs > nextBuildFinishTimeMs) {
+        nextBuildFinishTimeMs += parseFromStringToMs("25:59:59");
+        //take 3 minutes from refresh timer to user quick completion
+        return nextBuildFinishTimeMs - lastLoadTimeMs - 180000;
+    }
+
+    return nextBuildFinishTimeMs - lastLoadTimeMs - 180000;
 }
