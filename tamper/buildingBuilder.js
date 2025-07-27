@@ -24,9 +24,9 @@ window.addEventListener('load', function() {
     completeBuildingButtonList = document.getElementsByClassName("btn-instant-free");
     completeQuestButtonList = document.getElementsByClassName("quest-complete-btn");
 	
-    if(buildingButtonList.length > 0) click(buildingButtonList);
-    if(buildingButtonList.length > 0) click(completeBuildingButtonList);
-    if(buildingButtonList.length > 0) click(completeQuestButtonList);
+    if(buildingButtonList.length > 0) clickButton(buildingButtonList);
+    if(buildingButtonList.length > 0) clickButton(completeBuildingButtonList);
+    if(buildingButtonList.length > 0) clickButton(completeQuestButtonList);
 	
     console.log("done: ");
     setTimeout(function(){refresh();},delayRefreshPagina);
@@ -45,6 +45,15 @@ function refresh() {
     }
 }
 
-function click(buttonList) {
+function clickButton(buttonList) {
 	console.log(buttonList);
+	for (i = 0; i < buttonList.length; i++) {
+		if (!buttonList[i].style[0] == "display") {
+			buttonList[i].click();
+			console.log("clicked button:" + buttonList[i]);
+		}
+		else {
+			console.log("inactive button:" + buttonList[i]);
+		}
+	}
 }
