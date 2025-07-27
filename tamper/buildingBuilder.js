@@ -60,6 +60,7 @@ function clickButton(buttonList) {
 	for (var i = 0; i < buttonList.length; i++) {
 		if (buttonList[i].style[0] == undefined) {
 			buttonList[i].click();
+		
 			console.log("clicked button:");
 			console.log(buttonList[i]);
 			console.log($('#main_buildlink_main_8'));
@@ -68,5 +69,6 @@ function clickButton(buttonList) {
 			console.log("inactive button:" + buttonList[i]);
 			console.log($('#main_buildlink_main_8'));
 		}
+		setTimeout(function(){},delayBetweenActions);
 	}
 }
