@@ -15,8 +15,8 @@
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = 0; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
-const delayRefreshPaginaMin =  60000; // EXEMPLOS: 60000 1 min || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
-const delayRefreshPaginaMax = 120000; // EXEMPLOS:  60000 1 min || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
+const delayRefreshPaginaMin = 60000; // EXEMPLOS: 60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
+const delayRefreshPaginaMax = 90000; // EXEMPLOS:  60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 const delayBetweenActions = 1000 // // EXEMPLOS:  1000 1 sec
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
 const safetyRefreshBuffer = 2000;
@@ -28,22 +28,29 @@ const questCompleteBtnLabel = 'quest-complete-btn';
 var delayRefreshPagina = Math.floor((Math.random() * delayRefreshPaginaMin) + delayRefreshPaginaMax); // ms
 
 window.addEventListener('load', function() {
+	refreshNext = false;
 
     var buildingButtonList = document.getElementsByClassName(buildingQuestBtnLabel);
-    if(buildingButtonList.length > 0) clickButton(buildingButtonList, buildingQuestBtnLabel);
+    if(buildingButtonList.length > 0) {
+		refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel || refreshNext);
+	}
 
     setTimeout(function(){},delayBetweenActions);
 
     var completeBuildingButtonList = document.getElementsByClassName(completeBuildingBtnLabel);
-    if(buildingButtonList.length > 0) clickButton(completeBuildingButtonList, completeBuildingBtnLabel);
+    if(completeBuildingButtonList.length > 0) {
+		refreshNext = clickButton(completeBuildingButtonList, buildingQuestBtnLabel || refreshNext);
+	}
 
     setTimeout(function(){},delayBetweenActions);
 
     var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
-    if(buildingButtonList.length > 0) clickButton(completeQuestButtonList, questCompleteBtnLabel);
+    if(completeQuestButtonList.length > 0) {
+		refreshNext = clickButton(completeQuestButtonList, buildingQuestBtnLabel || refreshNext);
+	}
 
-    console.log("done");
-    setTimeout(function(){refresh();},delayRefreshPagina);
+    console.log("done.\nrefreshing: " + refreshNext);
+    setTimeout(function(){refresh();},refreshNext ? safetyRefreshBuffer : delayRefreshPagina);
 
 }, false);
 
@@ -60,6 +67,8 @@ function refresh() {
 }
 
 function clickButton(buttonList, BtnLabel) {
+	refreshNext = false;
+	
     if(buttonList.length == 0) {
         console.log("No buttons found for " + BtnLabel);
         return;
@@ -76,7 +85,8 @@ function clickButton(buttonList, BtnLabel) {
 
             if(BtnLabel == completeBuildingBtnLabel) {
                 console.log("refreshing to check for other free completes");
-                setTimeout(function(){refresh();},safetyRefreshBuffer);
+				refreshNext = true;
+				
             }
 		}
 		else {
@@ -84,5 +94,6 @@ function clickButton(buttonList, BtnLabel) {
 		}
 		setTimeout(function(){},delayBetweenActions);
 	}
-    console.log("no more " + BtnLabel);
+    console.log("no more " + BtnLabel + "\nrefreshing next: " + refreshNext);
+	return refreshNext;
 }
