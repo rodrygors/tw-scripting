@@ -3,7 +3,7 @@
 // @author Rodrygors
 // @version 0.9.6.9
 // @grant Publico
-// @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões do pop up Discord: Rodrygors#5516
+// @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões de pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
 // ==/UserScript==
 //******************************* READ ME: *******************************
@@ -29,8 +29,11 @@ const alternarAldeia = false; // 0 = Não muda de aldeia, e dá refresh após o 
 
 //Builder modes have priority as bellow
 //If both questBuilderActive and resourcesBuilderActive are true, quest builds will be clicked before resources
-const questBuilderActive = true;
+const questBuilderActive = false;
 const resourcesBuilderActive = true;
+const quickFinishActive = true;
+const questFinisherActive = false; //NOT WORKING ATM
+
 //Script will check how much farm capacity is left, if current pop > capacity * farmMargin  then script willattempt to upgrade storage
 //0.0 -> allways upgrade farm || 1.0 -> only upgrades farm current pop is equal to farm capacity || 99.0 -> never upgrade farm (why chose this??)
 const farmMargin = 0.9;
@@ -38,13 +41,10 @@ const farmMargin = 0.9;
 //0.0 -> allways upgrade storage || 1.0 -> only upgrades storage when building is more expensive than storage capacity || 99.0 -> never upgrade storage (why chose this??)
 const storageMargin = 0.9;
 
-const quickFinishActive = true;
-const questFinisherActive = false; //NOT WORKING ATM
-
 const delayRefreshPaginaMin = 120000; // EXEMPLOS: 60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 const delayRefreshPaginaMax = 300000; // EXEMPLOS:  60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
-const delayBetweenActions = 1000 // // EXEMPLOS:  1000 1 sec
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
+const delayBetweenActions = 1000 // // EXEMPLOS:  1000 1 sec
 const safetyRefreshBuffer = 2000;
 const lastLoadedMS = Date.now();
 
@@ -129,6 +129,7 @@ function fetchAndClick() {
         setTimeout(function(){},delayBetweenActions);
     }
     if(questFinisherActive) {
+        setTimeout(function(){},delayBetweenActions*5);
         var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
         refreshNext = clickButtons(completeQuestButtonList, questCompleteBtnLabel) || refreshNext;
     }
