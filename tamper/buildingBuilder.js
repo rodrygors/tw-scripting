@@ -115,8 +115,8 @@ function fetchAndClick() {
     var refreshNext = false;
 
     if(questBuilderActive) {
-        var buildingButton = document.querySelector(buildingQuestBtnClass);
-        clickButton(buildingButton, buildingQuestBtnLabel);
+        var buildingButton = document.getElementsByClassName(buildingQuestBtnLabel);
+        refreshNext = clickButtons(buildingButton, buildingQuestBtnLabel) || refreshNext;
         setTimeout(function(){},delayBetweenActions);
     }
     if(resourcesBuilderActive) {
@@ -140,7 +140,7 @@ function fetchAndClick() {
 function clickResourceBuildingButton() {
     var buildingToBuildButton = dynamicButtonChooser3000();
 
-    if(isBuildingButtonAvailable(buildingToBuildButton)) {
+    if(isButtonAvailable(buildingToBuildButton)) {
         buildingToBuildButton.click();
     }
     else {
@@ -149,35 +149,66 @@ function clickResourceBuildingButton() {
     }
 }
 
-function clickButton(button, BtnLabel) {
+function clickButtons(buttonList, BtnLabel) {
+	var refreshNext = false;
 
-    if (BtnLabel == buildingQuestBtnLabel) {
-        if(!isBuildingButtonAvailable(button)){
-            console.log("Invalid button for " + BtnLabel + ":");
-            console.log(button);
-            return;
-        }
-
-        var buildingName = getBuildingNameFromButton(button);
-        var buildingRowId = getRowIdFromBuildingName(buildingName);
-
-        if(isFarmUpgradeNeeded()) {
-            var farmButton = getBuildingButtonFromRow(farmBuildRowId);
-            if (isBuildingButtonAvailable(farmButton)) {
-                console.log("Farm needs upgrade!");
-                button = farmButton;
-            }
-        }
-
-        if(isStorageUpgradeNeeded(buildingRowId, storageCapacity)) {
-            var storageButton = getBuildingButtonFromRow(storageBuildRowId);
-            if (isBuildingButtonAvailable(storageButton)) {
-                console.log("Storage needs upgrade!");
-                button = storageButton;
-            }
-        }
-        return button;
+    if(buttonList.length == 0) {
+        console.log("No buttons found for " + BtnLabel);
+        return;
     }
+
+	console.log("button list: " + BtnLabel);
+	console.log(buttonList);
+
+	for (var i = 0; i < buttonList.length; i++) {
+        if(BtnLabel == buildingQuestBtnLabel) {
+            clickBuildButton(buttonList[i], BtnLabel);
+        }
+		else if(isButtonAvailable(buttonList[i])) {
+			buttonList[i].click();
+			console.log("clicked button:");
+			console.log(buttonList[i]);
+
+            if(BtnLabel == completeBuildingBtnLabel) {
+                console.log("refreshing to check for other free completes");
+				refreshNext = true;
+            }
+		}
+		else {
+			console.log("inactive button:" + buttonList[i]);
+		}
+		setTimeout(function(){},delayBetweenActions);
+	}
+    console.log("no more " + BtnLabel + "\nrefreshing next: " + refreshNext);
+	return refreshNext;
+}
+
+function clickBuildButton(button, BtnLabel) {
+    if(!isButtonAvailable(button)){
+        console.log("Invalid button for " + BtnLabel + ":");
+        console.log(button);
+        return;
+    }
+
+    var buildingName = getBuildingNameFromButton(button);
+    var buildingRowId = getRowIdFromBuildingName(buildingName);
+
+    if(isFarmUpgradeNeeded()) {
+        var farmButton = getBuildingButtonFromRow(farmBuildRowId);
+        if (isButtonAvailable(farmButton)) {
+            console.log("Farm needs upgrade!");
+            button = farmButton;
+        }
+    }
+
+    if(isStorageUpgradeNeeded(buildingRowId, storageCapacity)) {
+        var storageButton = getBuildingButtonFromRow(storageBuildRowId);
+        if (isButtonAvailable(storageButton)) {
+            console.log("Storage needs upgrade!");
+            button = storageButton;
+        }
+    }
+    button.click();
 }
 
 function dynamicButtonChooser3000() {
@@ -198,7 +229,7 @@ function dynamicButtonChooser3000() {
         }
 
         //Check if button is unavailable
-        if(isBuildingButtonAvailable(buildingButton)) {
+        if(isButtonAvailable(buildingButton)) {
             console.log("Can't build " + currBuildingName + "!");
             continue;
         }
@@ -212,14 +243,14 @@ function dynamicButtonChooser3000() {
         }
     }
 
-    if (isBuildingButtonAvailable(buildingToBuildButton)) {
+    if (isButtonAvailable(buildingToBuildButton)) {
         console.log("lowest resource: " + getBuildingNameFromButton(buildingToBuildButton) + " (level " + getBuildingLevelFromButton(buildingToBuildButton) + ")");
         console.log(buildingToBuildButton);
     }
 
     if(isStorageUpgradeNeeded(buildingToBuildRowId, storageCapacity)) {
         var storageButton = getBuildingButtonFromRow(storageBuildRowId);
-        if (isBuildingButtonAvailable(storageButton)) {
+        if (isButtonAvailable(storageButton)) {
             console.log("Storage needs upgrade!");
             buildingToBuildButton = storageButton;
         }
@@ -227,44 +258,13 @@ function dynamicButtonChooser3000() {
 
     if(isFarmUpgradeNeeded()) {
         var farmButton = getBuildingButtonFromRow(farmBuildRowId);
-        if (isBuildingButtonAvailable(farmButton)) {
+        if (isButtonAvailable(farmButton)) {
             console.log("Farm needs upgrade!");
             buildingToBuildButton = farmButton;
         }
     }
 
     return buildingToBuildButton;
-}
-
-function clickButtons(buttonList, BtnLabel) {
-	var refreshNext = false;
-
-    if(buttonList.length == 0) {
-        console.log("No buttons found for " + BtnLabel);
-        return;
-    }
-
-	console.log("button list: " + BtnLabel);
-	console.log(buttonList);
-
-	for (var i = 0; i < buttonList.length; i++) {
-		if(buttonList[i].style[0] == undefined) {
-			buttonList[i].click();
-			console.log("clicked button:");
-			console.log(buttonList[i]);
-
-            if(BtnLabel == completeBuildingBtnLabel) {
-                console.log("refreshing to check for other free completes");
-				refreshNext = true;
-            }
-		}
-		else {
-			console.log("inactive button:" + buttonList[i]);
-		}
-		setTimeout(function(){},delayBetweenActions);
-	}
-    console.log("no more " + BtnLabel + "\nrefreshing next: " + refreshNext);
-	return refreshNext;
 }
 
 function getBuildingButtonFromRow(buildingRow) {
@@ -283,8 +283,8 @@ function getBuildingLevelFromButton(buildingButton) {
     return parseInt(buildingButton.getAttribute("data-level-next")) - 1;
 }
 
-function isBuildingButtonAvailable(buildingButton) {
-    return !(buildingButton == null || buildingButton == undefined || buildingButton.getAttribute("style") == "display:none");
+function isButtonAvailable(button) {
+    return !(button == null || button == undefined || button.getAttribute("style") == "display:none" || button.getAttribute("style") == "display: none");
 }
 
 function isStorageUpgradeNeeded(buildingToBuildRowId, storageCapacity) {
