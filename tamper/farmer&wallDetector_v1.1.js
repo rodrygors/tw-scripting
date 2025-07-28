@@ -175,7 +175,7 @@ function sendAttacks()
         var statusModelA = checkTroops('A'); //hn dá refresh???
         var statusModelB = checkTroops('B');
         console.log(clickIndex + " / " + (plunderList.length-1));
-        if( ( ++clickIndex == 0 || clickIndex == 1 ) && plunderList[clickIndex].attributes.length == 0 ){
+        if( ( ++clickIndex == 0 || clickIndex == 1 ) && plunderList[clickIndex]?.attributes.length == 0 ){
             hasVillageToAttack = 0;
         }
         else if( clickIndex >= plunderList.length ) {
@@ -242,6 +242,7 @@ function sendAttacks()
         else {
             if ( alternarAldeia == 0 ) {
                 console.log("Tropas(ou algum uncaught error...) " + clickIndex);
+                console.log(refreshIntervalId);
                 countDown(refreshIntervalId, "Não há tropas suficientes. A aguardar o refresh automático.");
             }
             else {
