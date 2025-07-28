@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name buildingBuilder
 // @author Rodrygors
-// @version 0.9.6.9
+// @version 1.0
 // @grant Publico
 // @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões de pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
@@ -9,20 +9,12 @@
 //******************************* READ ME: *******************************
 //******************************* Dev Notes: *******************************
 //27/07/25 -> v0.3
-//Quest completer not yet online
-//27/07/25 -> v0.9
-//Basic functionality working
-//27/07/25 -> v0.9.1
-//Auto refresh to handle multiple order completes
-//27/07/25 -> v0.9.2
-//Added UI refresh timer
-//27/07/25 -> v0.9.3
-//Added smart refresh timer to refresh based on time loeft to quick build
-//27/07/25 -> v0.9.4
-//Added flags to enable / disable features
+//Quest completer not yet onlines
 //27/07/25 -> v0.9.6.9
 //Script will now build farm or storage according to need (flags to controll this: farmMargin and storageMargin)
 //Other general improvements
+//27/07/25 -> v1.0
+//All major functionalities are working check "DEFINIÇÕES GERAIS" for more info
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = false; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
@@ -77,14 +69,25 @@ const farmCapacity = parseFloat(document.querySelector("#pop_max_label").textCon
 var delayRefreshPagina = Math.floor((Math.random() * (delayRefreshPaginaMax - delayRefreshPaginaMin)) + delayRefreshPaginaMin); // ms
 var refreshNext = false;
 
+if(questFinisherActive) {
+    const mutationObserver = new MutationObserver(entries => {
+        var toObserve = document.querySelector(".quest-title");
+        if(toObserve == null || toObserve == undefined) return;
+
+        const subMutationObserver = new MutationObserver(subEntry => {
+            fetchAndClickQuests();
+        })
+
+        subMutationObserver.observe(toObserve.children[0], {childList: true, characterData: true});
+        fetchAndClickQuests();
+    })
+    mutationObserver.observe(document.querySelector("#ds_body"), {attributes: true});
+}
+
 window.addEventListener('load', async function() {
     console.log("refresh delay: " + delayRefreshPagina);
 
-   fetchAndClickBuilds();
-
-    console.log("HELLO!");
-    setTimeout(fetchAndClickQuests(), delayBetweenActions*5);
-    console.log("BYE!");
+    fetchAndClickBuilds();
 
     var nextOrderCompletionTime = "";
     try{
@@ -122,12 +125,10 @@ function fetchAndClickBuilds() {
 }
 
 function fetchAndClickQuests() {
-    if(questFinisherActive) {
-        var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
-        clickButtons(completeQuestButtonList, questCompleteBtnLabel);
-    }
+    var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
+    clickButtons(completeQuestButtonList, questCompleteBtnLabel);
 
-    console.log("done with build.\nrefreshing now: " + refreshNext);
+    console.log("done with quests.\nrefreshing now: " + refreshNext);
 }
 
 function clickResourceBuildingButton() {
@@ -198,6 +199,8 @@ function clickBuildButton(button, BtnLabel) {
             button = storageButton;
         }
     }
+    console.log("clicking quest building:");
+    console.log(button);
     button.click();
 }
 
