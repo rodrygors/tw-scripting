@@ -100,7 +100,8 @@ window.addEventListener('load', async function() {
     var lastLoadTimeString = parseTimeFromPM(new Date(lastLoadedMS).toLocaleTimeString().split(" ").map(String));
 
     var refreshDelay = getRefreshDelay(lastLoadTimeString, nextOrderCompletionTime);
-    console.log("Refresh timer:", parseDelayRefreshPagina(refreshDelay));
+    console.log(new Date(lastLoadedMS).toLocaleTimeString() + " " + lastLoadTimeString + " " + nextOrderCompletionTime);
+    console.log("Refresh timer: " + parseDelayRefreshPagina(refreshDelay));
 
     setTimeout(function(){refresh();},refreshNext ? safetyRefreshBuffer : refreshDelay);
     countDown("Refreshing in:", refreshNext ? safetyRefreshBuffer : refreshDelay);
@@ -333,9 +334,11 @@ function parseTimeFromPM([timeTrim, suff]) {
     const [hours, minutes, seconds] = timeTrim.split(":").map(String);
 
     var pmHours = (parseInt(hours) + 12).toString();
+    var amHours = hours;
+    if(hours==12) amHours = 0;
 
     if (suff == "PM") return pmHours + ":" + minutes + ":" + seconds;
-    else return hours + ":" + minutes + ":" + seconds;
+    else return amHours + ":" + minutes + ":" + seconds;
 }
 
 function parseFromStringToMs(time){
