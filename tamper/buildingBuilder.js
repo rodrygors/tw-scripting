@@ -24,7 +24,7 @@ const alternarAldeia = false; // 0 = Não muda de aldeia, e dá refresh após o 
 const questBuilderActive = true;
 const resourcesBuilderActive = true;
 const quickFinishActive = true;
-const questFinisherActive = true; //NOT WORKING ATM
+const questFinisherActive = true;
 
 //Script will check how much farm capacity is left, if current pop > capacity * farmMargin  then script willattempt to upgrade storage
 //0.0 -> allways upgrade farm || 1.0 -> only upgrades farm current pop is equal to farm capacity || 99.0 -> never upgrade farm (why chose this??)
@@ -41,7 +41,6 @@ const safetyRefreshBuffer = 2000;
 const lastLoadedMS = Date.now();
 
 const buildingQuestBtnLabel = 'current-quest';
-const buildingQuestBtnClass = '.current-quest';
 const completeBuildingBtnLabel = 'btn-instant-free';
 const questCompleteBtnLabel = 'quest-complete-btn';
 
