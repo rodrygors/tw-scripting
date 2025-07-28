@@ -29,10 +29,10 @@ const alternarAldeia = false; // 0 = Não muda de aldeia, e dá refresh após o 
 
 //Builder modes have priority as bellow
 //If both questBuilderActive and resourcesBuilderActive are true, quest builds will be clicked before resources
-const questBuilderActive = false;
+const questBuilderActive = true;
 const resourcesBuilderActive = true;
 const quickFinishActive = true;
-const questFinisherActive = false; //NOT WORKING ATM
+const questFinisherActive = true; //NOT WORKING ATM
 
 //Script will check how much farm capacity is left, if current pop > capacity * farmMargin  then script willattempt to upgrade storage
 //0.0 -> allways upgrade farm || 1.0 -> only upgrades farm current pop is equal to farm capacity || 99.0 -> never upgrade farm (why chose this??)
@@ -75,11 +75,16 @@ const currentPop = parseFloat(document.querySelector("#pop_current_label").textC
 const farmCapacity = parseFloat(document.querySelector("#pop_max_label").textContent);
 
 var delayRefreshPagina = Math.floor((Math.random() * (delayRefreshPaginaMax - delayRefreshPaginaMin)) + delayRefreshPaginaMin); // ms
+var refreshNext = false;
 
-window.addEventListener('load', function() {
+window.addEventListener('load', async function() {
     console.log("refresh delay: " + delayRefreshPagina);
 
-    var refreshNext = fetchAndClick();
+   fetchAndClickBuilds();
+
+    console.log("HELLO!");
+    setTimeout(fetchAndClickQuests(), delayBetweenActions*5);
+    console.log("BYE!");
 
     var nextOrderCompletionTime = "";
     try{
@@ -99,43 +104,30 @@ window.addEventListener('load', function() {
 
 }, false);
 
-function refresh() {
-    if ( alternarAldeia ) location.reload();
-    else {
-        $('.groupRight').click();
-        $('.arrowRight').click();
-        try {document.getElementsByClassName('jump_link')[0].click();}
-        finally {
-        setTimeout(function(){location.reload();}, safetyRefreshBuffer);
-        }
-    }
-}
-
-function fetchAndClick() {
-    var refreshNext = false;
+function fetchAndClickBuilds() {
 
     if(questBuilderActive) {
         var buildingButton = document.getElementsByClassName(buildingQuestBtnLabel);
-        refreshNext = clickButtons(buildingButton, buildingQuestBtnLabel) || refreshNext;
-        setTimeout(function(){},delayBetweenActions);
+        clickButtons(buildingButton, buildingQuestBtnLabel);
     }
     if(resourcesBuilderActive) {
         clickResourceBuildingButton();
-        setTimeout(function(){},delayBetweenActions);
     }
     if(quickFinishActive) {
         var completeBuildingButtonList = document.getElementsByClassName(completeBuildingBtnLabel);
-        refreshNext = clickButtons(completeBuildingButtonList, completeBuildingBtnLabel) || refreshNext;
-        setTimeout(function(){},delayBetweenActions);
-    }
-    if(questFinisherActive) {
-        setTimeout(function(){},delayBetweenActions*5);
-        var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
-        refreshNext = clickButtons(completeQuestButtonList, questCompleteBtnLabel) || refreshNext;
+        clickButtons(completeBuildingButtonList, completeBuildingBtnLabel);
     }
 
-    console.log("done.\nrefreshing now: " + refreshNext);
-    return refreshNext;
+    console.log("done with build.\nrefreshing now: " + refreshNext);
+}
+
+function fetchAndClickQuests() {
+    if(questFinisherActive) {
+        var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
+        clickButtons(completeQuestButtonList, questCompleteBtnLabel);
+    }
+
+    console.log("done with build.\nrefreshing now: " + refreshNext);
 }
 
 function clickResourceBuildingButton() {
@@ -151,8 +143,6 @@ function clickResourceBuildingButton() {
 }
 
 function clickButtons(buttonList, BtnLabel) {
-	var refreshNext = false;
-
     if(buttonList.length == 0) {
         console.log("No buttons found for " + BtnLabel);
         return;
@@ -181,7 +171,6 @@ function clickButtons(buttonList, BtnLabel) {
 		setTimeout(function(){},delayBetweenActions);
 	}
     console.log("no more " + BtnLabel + "\nrefreshing next: " + refreshNext);
-	return refreshNext;
 }
 
 function clickBuildButton(button, BtnLabel) {
@@ -230,12 +219,13 @@ function dynamicButtonChooser3000() {
         }
 
         //Check if button is unavailable
-        if(isButtonAvailable(buildingButton)) {
+        if(!isButtonAvailable(buildingButton)) {
             console.log("Can't build " + currBuildingName + "!");
+            console.log(buildingButton);
             continue;
         }
 
-        var buildLevel = getBuildingNameFromButton(buildingButton);
+        var buildLevel = getBuildingLevelFromButton(buildingButton);
 
         if (buildLevel < lowestResourceBuildingLevel) {
             lowestResourceBuildingLevel = buildLevel;
@@ -311,6 +301,18 @@ function isFarmOnQueue() {
     return !(farmOnQueue == null);
 }
 
+function refresh() {
+    if ( alternarAldeia ) location.reload();
+    else {
+        $('.groupRight').click();
+        $('.arrowRight').click();
+        try {document.getElementsByClassName('jump_link')[0].click();}
+        finally {
+        setTimeout(function(){location.reload();}, safetyRefreshBuffer);
+        }
+    }
+}
+
 function countDown(mensagemErro, delay){
     setInterval(function(){
         UI.ErrorMessage(mensagemErro + "\n(" + parseDelayRefreshPagina(delay - (Date.now() - lastLoadedMS - safetyRefreshBuffer)) + ")", 950);
@@ -351,6 +353,10 @@ function getRefreshDelay(lastLoadTime, nextBuildFinishTime) {
     }
 
     return nextBuildFinishTimeMs - lastLoadTimeMs - 180000;
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function getRowIdFromBuildingName(buildingName) {
