@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name buildingBuilder
 // @author Rodrygors
-// @version 0.9.4
+// @version 0.9.6.9
 // @grant Publico
 // @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões do pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
@@ -20,22 +20,59 @@
 //Added smart refresh timer to refresh based on time loeft to quick build
 //27/07/25 -> v0.9.4
 //Added flags to enable / disable features
+//27/07/25 -> v0.9.6.9
+//Script will now build farm or storage according to need (flags to controll this: farmMargin and storageMargin)
+//Other general improvements
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = false; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
-const builderActive = true;
+
+//Builder modes have priority as bellow
+//If both questBuilderActive and resourcesBuilderActive are true, quest builds will be clicked before resources
+const questBuilderActive = true;
+const resourcesBuilderActive = true;
+//Script will check how much farm capacity is left, if current pop > capacity * farmMargin  then script willattempt to upgrade storage
+//0.0 -> allways upgrade farm || 1.0 -> only upgrades farm current pop is equal to farm capacity || 99.0 -> never upgrade farm (why chose this??)
+const farmMargin = 0.9;
+//Script will check how much storage is left, and if building costs more than the storage capacity * storageMargin then script willattempt to upgrade storage
+//0.0 -> allways upgrade storage || 1.0 -> only upgrades storage when building is more expensive than storage capacity || 99.0 -> never upgrade storage (why chose this??)
+const storageMargin = 0.9;
+
 const quickFinishActive = true;
-const questFinisherActive = true; //NOT WORKING ATM
-const delayRefreshPaginaMin = 60000; // EXEMPLOS: 60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
-const delayRefreshPaginaMax = 90000; // EXEMPLOS:  60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
+const questFinisherActive = false; //NOT WORKING ATM
+
+const delayRefreshPaginaMin = 120000; // EXEMPLOS: 60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
+const delayRefreshPaginaMax = 300000; // EXEMPLOS:  60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 const delayBetweenActions = 1000 // // EXEMPLOS:  1000 1 sec
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
 const safetyRefreshBuffer = 2000;
 const lastLoadedMS = Date.now();
 
 const buildingQuestBtnLabel = 'current-quest';
+const buildingQuestBtnClass = '.current-quest';
 const completeBuildingBtnLabel = 'btn-instant-free';
 const questCompleteBtnLabel = 'quest-complete-btn';
+
+const mainBuildRowId = '#main_buildrow_main';
+const barracksBuildRowId = '#main_buildrow_barracks';
+const stableBuildRowId = '#main_buildrow_stable';
+const smithBuildRowId = '#main_buildrow_smith';
+const placeBuildRowId = '#main_buildrow_place';
+const statueBuildRowId = '#main_buildrow_statue';
+const marketBuildRowId = '#main_buildrow_market';
+const woodBuildRowId = '#main_buildrow_wood';
+const stoneBuildRowId = '#main_buildrow_stone';
+const ironBuildRowId = '#main_buildrow_iron';
+const farmBuildRowId = '#main_buildrow_farm';
+const storageBuildRowId = '#main_buildrow_storage';
+const hideBuildRowId = '#main_buildrow_hide';
+const wallBuildRowId = '#main_buildrow_wall';
+
+const queueFarmClass = '.buildorder_farm';
+
+const storageCapacity = parseFloat(document.querySelector("#storage").textContent);
+const currentPop = parseFloat(document.querySelector("#pop_current_label").textContent);
+const farmCapacity = parseFloat(document.querySelector("#pop_max_label").textContent);
 
 var delayRefreshPagina = Math.floor((Math.random() * (delayRefreshPaginaMax - delayRefreshPaginaMin)) + delayRefreshPaginaMin); // ms
 
@@ -77,26 +114,129 @@ function refresh() {
 function fetchAndClick() {
     var refreshNext = false;
 
-    if(builderActive) {
-        var buildingButtonList = document.getElementsByClassName(buildingQuestBtnLabel);
-        refreshNext = clickButton(buildingButtonList, buildingQuestBtnLabel) || refreshNext;
+    if(questBuilderActive) {
+        var buildingButton = document.querySelector(buildingQuestBtnClass);
+        clickButton(buildingButton, buildingQuestBtnLabel);
+        setTimeout(function(){},delayBetweenActions);
+    }
+    if(resourcesBuilderActive) {
+        clickResourceBuildingButton();
         setTimeout(function(){},delayBetweenActions);
     }
     if(quickFinishActive) {
         var completeBuildingButtonList = document.getElementsByClassName(completeBuildingBtnLabel);
-        refreshNext = clickButton(completeBuildingButtonList, completeBuildingBtnLabel) || refreshNext;
+        refreshNext = clickButtons(completeBuildingButtonList, completeBuildingBtnLabel) || refreshNext;
         setTimeout(function(){},delayBetweenActions);
     }
     if(questFinisherActive) {
         var completeQuestButtonList = document.getElementsByClassName(questCompleteBtnLabel);
-        refreshNext = clickButton(completeQuestButtonList, questCompleteBtnLabel) || refreshNext;
+        refreshNext = clickButtons(completeQuestButtonList, questCompleteBtnLabel) || refreshNext;
     }
 
     console.log("done.\nrefreshing now: " + refreshNext);
     return refreshNext;
 }
 
-function clickButton(buttonList, BtnLabel) {
+function clickResourceBuildingButton() {
+    var buildingToBuildButton = dynamicButtonChooser3000();
+
+    if(isBuildingButtonAvailable(buildingToBuildButton)) {
+        buildingToBuildButton.click();
+    }
+    else {
+        console.log("Invalid button for resourcesBuilder mode: ");
+        console.log(buildingToBuildButton);
+    }
+}
+
+function clickButton(button, BtnLabel) {
+
+    if (BtnLabel == buildingQuestBtnLabel) {
+        if(!isBuildingButtonAvailable(button)){
+            console.log("Invalid button for " + BtnLabel + ":");
+            console.log(button);
+            return;
+        }
+
+        var buildingName = getBuildingNameFromButton(button);
+        var buildingRowId = getRowIdFromBuildingName(buildingName);
+
+        if(isFarmUpgradeNeeded()) {
+            var farmButton = getBuildingButtonFromRow(farmBuildRowId);
+            if (isBuildingButtonAvailable(farmButton)) {
+                console.log("Farm needs upgrade!");
+                button = farmButton;
+            }
+        }
+
+        if(isStorageUpgradeNeeded(buildingRowId, storageCapacity)) {
+            var storageButton = getBuildingButtonFromRow(storageBuildRowId);
+            if (isBuildingButtonAvailable(storageButton)) {
+                console.log("Storage needs upgrade!");
+                button = storageButton;
+            }
+        }
+        return button;
+    }
+}
+
+function dynamicButtonChooser3000() {
+    var resourceBuildingRows = [woodBuildRowId, stoneBuildRowId, ironBuildRowId];
+
+    var lowestResourceBuildingLevel = 99;
+    var buildingToBuildRowId;
+    var buildingToBuildButton;
+
+    for(var i=0; i<resourceBuildingRows.length; i++) {
+        var buildingButton = getBuildingButtonFromRow(resourceBuildingRows[i]);
+        var currBuildingName = buildingButton.getAttribute("data-building")
+
+        //Check if building button is available
+        if(isBuildingMaxedOut(resourceBuildingRows[i])) {
+            console.log("Cannot build " + currBuildingName + "!");
+            continue;
+        }
+
+        //Check if button is unavailable
+        if(isBuildingButtonAvailable(buildingButton)) {
+            console.log("Can't build " + currBuildingName + "!");
+            continue;
+        }
+
+        var buildLevel = getBuildingNameFromButton(buildingButton);
+
+        if (buildLevel < lowestResourceBuildingLevel) {
+            lowestResourceBuildingLevel = buildLevel;
+            buildingToBuildRowId = resourceBuildingRows[i];
+            buildingToBuildButton = buildingButton;
+        }
+    }
+
+    if (isBuildingButtonAvailable(buildingToBuildButton)) {
+        console.log("lowest resource: " + getBuildingNameFromButton(buildingToBuildButton) + " (level " + getBuildingLevelFromButton(buildingToBuildButton) + ")");
+        console.log(buildingToBuildButton);
+    }
+
+    if(isStorageUpgradeNeeded(buildingToBuildRowId, storageCapacity)) {
+        var storageButton = getBuildingButtonFromRow(storageBuildRowId);
+        if (isBuildingButtonAvailable(storageButton)) {
+            console.log("Storage needs upgrade!");
+            buildingToBuildButton = storageButton;
+        }
+    }
+
+    if(isFarmUpgradeNeeded()) {
+        var farmButton = getBuildingButtonFromRow(farmBuildRowId);
+        if (isBuildingButtonAvailable(farmButton)) {
+            console.log("Farm needs upgrade!");
+            buildingToBuildButton = farmButton;
+        }
+    }
+
+    return buildingToBuildButton;
+}
+
+function clickButtons(buttonList, BtnLabel) {
 	var refreshNext = false;
 
     if(buttonList.length == 0) {
@@ -125,6 +265,49 @@ function clickButton(buttonList, BtnLabel) {
 	}
     console.log("no more " + BtnLabel + "\nrefreshing next: " + refreshNext);
 	return refreshNext;
+}
+
+function getBuildingButtonFromRow(buildingRow) {
+    return document.querySelector(buildingRow).children[6].children[1];
+}
+
+function isBuildingMaxedOut(buildingRow) {
+    return document.querySelector(buildingRow).children[1].getAttribute("class") == "inactive center";
+}
+
+function getBuildingNameFromButton(buildingButton) {
+    return buildingButton.getAttribute("data-building");
+}
+
+function getBuildingLevelFromButton(buildingButton) {
+    return parseInt(buildingButton.getAttribute("data-level-next")) - 1;
+}
+
+function isBuildingButtonAvailable(buildingButton) {
+    return !(buildingButton == null || buildingButton == undefined || buildingButton.getAttribute("style") == "display:none");
+}
+
+function isStorageUpgradeNeeded(buildingToBuildRowId, storageCapacity) {
+    if(buildingToBuildRowId == undefined) return false;
+
+    for(var i = 1; i<=3; i++){
+        var requiredResources = parseFloat(document.querySelector(buildingToBuildRowId).children[i].getAttribute("data-cost"));
+        if(requiredResources > (storageCapacity * 0.8)) {
+            console.log("Need more resources: " + requiredResources + " > " + storageCapacity + " * 0.8");
+            return true;
+        }
+    }
+    return false;
+}
+
+function isFarmUpgradeNeeded() {
+    if(isFarmOnQueue()) return false;
+    return currentPop >= farmCapacity * farmMargin;
+}
+
+function isFarmOnQueue() {
+    var farmOnQueue = document.querySelector(queueFarmClass);
+    return !(farmOnQueue == null);
 }
 
 function countDown(mensagemErro, delay){
@@ -167,4 +350,39 @@ function getRefreshDelay(lastLoadTime, nextBuildFinishTime) {
     }
 
     return nextBuildFinishTimeMs - lastLoadTimeMs - 180000;
+}
+
+function getRowIdFromBuildingName(buildingName) {
+    switch (buildingName){
+        case "main":
+            return mainBuildRowId;
+        case "barracks":
+            return barracksBuildRowId;
+        case "stable":
+            return stableBuildRowId;
+        case "smith":
+            return smithBuildRowId;
+        case "place":
+            return placeBuildRowId;
+        case "statue":
+            return statueBuildRowId;
+        case "market":
+            return marketBuildRowId;
+        case "wood":
+            return woodBuildRowId;
+        case "stone":
+            return stoneBuildRowId;
+        case "iron":
+            return ironBuildRowId;
+        case "farm":
+            return farmBuildRowId;
+        case "storage":
+            return storageBuildRowId;
+        case "hide":
+            return hideBuildRowId;
+        case "wall":
+            return wallBuildRowId;
+        default:
+            return undefined;
+    }
 }
