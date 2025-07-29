@@ -9,7 +9,7 @@
 //******************************* READ ME: *******************************
 //******************************* Dev Notes: *******************************
 //27/07/25 -> v0.3
-//Quest completer not yet onlines
+//Quest completer not yet online
 //27/07/25 -> v0.9.6.9
 //Script will now build farm or storage according to need (flags to controll this: farmMargin and storageMargin)
 //Other general improvements
@@ -331,10 +331,13 @@ function parseDelayRefreshPagina(delayRefreshPagina){
 
 function parseTimeFromPM([timeTrim, suff]) {
     const [hours, minutes, seconds] = timeTrim.split(":").map(String);
-
+    console.log(timeTrim);
     var pmHours = (parseInt(hours) + 12).toString();
     var amHours = hours;
-    if(hours==12) amHours = 0;
+    if(hours==12) {
+       amHours = 0;
+       pmHours -= 12;
+    }
 
     if (suff == "PM") return pmHours + ":" + minutes + ":" + seconds;
     else return amHours + ":" + minutes + ":" + seconds;
