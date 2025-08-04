@@ -154,7 +154,7 @@ function clickButtons(buttonList, BtnLabel) {
         return;
     }
 
-    if(isQueueFull()) return;
+    if(isQueueFull() && BtnLabel != questCompleteBtnLabel) return;
 
 	console.log("button list: " + BtnLabel);
 	console.log(buttonList);
