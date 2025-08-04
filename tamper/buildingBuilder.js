@@ -62,7 +62,7 @@ const wallBuildRowId = '#main_buildrow_wall';
 const queueFarmClass = '.buildorder_farm';
 const queueStorageClass = '.buildorder_storage';
 
-const queueExtraCost = document.querySelector(".nodrag");
+const queueLength = document.querySelector("#buildqueue").children.length;
 
 const storageCapacity = parseFloat(document.querySelector("#storage").textContent);
 const currentPop = parseFloat(document.querySelector("#pop_current_label").textContent);
@@ -317,10 +317,11 @@ function isStorageOnQueue() {
 }
 
 function isQueueFull() {
-    if(queueExtraCost != null && queueExtraCost != undefined) {
+    if(queueLength != null && queueLength != undefined && queueLength > 6) {
         console.log("Queue is full!");
         return true;
     }
+    return false;
 }
 
 function refresh() {
