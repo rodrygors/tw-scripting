@@ -60,6 +60,9 @@ const hideBuildRowId = '#main_buildrow_hide';
 const wallBuildRowId = '#main_buildrow_wall';
 
 const queueFarmClass = '.buildorder_farm';
+const queueStorageClass = '.buildorder_storage';
+
+const queueExtraCost = document.querySelector(".nodrag");
 
 const storageCapacity = parseFloat(document.querySelector("#storage").textContent);
 const currentPop = parseFloat(document.querySelector("#pop_current_label").textContent);
@@ -132,6 +135,8 @@ function fetchAndClickQuests() {
 }
 
 function clickResourceBuildingButton() {
+    if(isQueueFull()) return;
+
     var buildingToBuildButton = dynamicButtonChooser3000();
 
     if(isButtonAvailable(buildingToBuildButton)) {
@@ -148,6 +153,8 @@ function clickButtons(buttonList, BtnLabel) {
         console.log("No buttons found for " + BtnLabel);
         return;
     }
+
+    if(isQueueFull()) return;
 
 	console.log("button list: " + BtnLabel);
 	console.log(buttonList);
@@ -282,7 +289,7 @@ function isButtonAvailable(button) {
 }
 
 function isStorageUpgradeNeeded(buildingToBuildRowId, storageCapacity) {
-    if(buildingToBuildRowId == undefined) return false;
+    if(buildingToBuildRowId == undefined || isStorageOnQueue()) return false;
 
     for(var i = 1; i<=3; i++){
         var requiredResources = parseFloat(document.querySelector(buildingToBuildRowId).children[i].getAttribute("data-cost"));
@@ -302,6 +309,18 @@ function isFarmUpgradeNeeded() {
 function isFarmOnQueue() {
     var farmOnQueue = document.querySelector(queueFarmClass);
     return !(farmOnQueue == null);
+}
+
+function isStorageOnQueue() {
+    var storageInQueue = document.querySelector(queueStorageClass);
+    return !(storageInQueue == null);
+}
+
+function isQueueFull() {
+    if(queueExtraCost != null && queueExtraCost != undefined) {
+        console.log("Queue is full!");
+        return true;
+    }
 }
 
 function refresh() {
