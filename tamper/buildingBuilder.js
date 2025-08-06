@@ -31,7 +31,7 @@ const questFinisherActive = true;
 const farmMargin = 0.9;
 //Script will check how much storage is left, and if building costs more than the storage capacity * storageMargin then script willattempt to upgrade storage
 //0.0 -> allways upgrade storage || 1.0 -> only upgrades storage when building is more expensive than storage capacity || 99.0 -> never upgrade storage (why chose this??)
-const storageMargin = 0.9;
+const storageMargin = 0.65;
 
 const delayRefreshPaginaMin = 120000; // EXEMPLOS: 60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
 const delayRefreshPaginaMax = 300000; // EXEMPLOS:  60000 1 min || 90000 = 1.5 mins || 120000 = 2 mins || 300000 0 5 mins || 600000 10 mins
@@ -62,7 +62,7 @@ const wallBuildRowId = '#main_buildrow_wall';
 const queueFarmClass = '.buildorder_farm';
 const queueStorageClass = '.buildorder_storage';
 
-const queueLength = document.querySelector("#buildqueue").children.length;
+const queueLength = getBuildQueueLength();
 
 const storageCapacity = parseFloat(document.querySelector("#storage").textContent);
 const currentPop = parseFloat(document.querySelector("#pop_current_label").textContent);
@@ -154,7 +154,7 @@ function clickButtons(buttonList, BtnLabel) {
         return;
     }
 
-    if(isQueueFull() && BtnLabel != questCompleteBtnLabel) return;
+    if(isQueueFull() && BtnLabel != completeBuildingBtnLabel) return;
 
 	console.log("button list: " + BtnLabel);
 	console.log(buttonList);
@@ -270,6 +270,13 @@ function dynamicButtonChooser3000() {
 
 function getBuildingButtonFromRow(buildingRow) {
     return document.querySelector(buildingRow).children[6].children[1];
+}
+
+function getBuildQueueLength() {
+    if (document.querySelector("#buildqueue") == null) {
+        return 0;
+    }
+    return document.querySelector("#buildqueue").children.length;
 }
 
 function isBuildingMaxedOut(buildingRow) {
