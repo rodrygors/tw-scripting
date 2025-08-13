@@ -17,8 +17,8 @@
 //All major functionalities are working check "DEFINIÇÕES GERAIS" for more info
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
-const alternarAldeia = false; // 0 = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // 1 = Muda de aldeia.
-
+const alternarAldeia = true; // false = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // true = Muda de aldeia.
+const refreshWithBuildDuration = false; // true -> set refresh timer to match the missing timer on a build - 3 minutes (works best with alternarAldeia = false)
 //Builder modes have priority as bellow
 //If both questBuilderActive and resourcesBuilderActive are true, quest builds will be clicked before resources
 const questBuilderActive = true;
@@ -100,8 +100,8 @@ window.addEventListener('load', async function() {
     }
 
     var lastLoadTimeString = parseTimeFromPM(new Date(lastLoadedMS).toLocaleTimeString().split(" ").map(String));
-
     var refreshDelay = getRefreshDelay(lastLoadTimeString, nextOrderCompletionTime);
+    
     console.log(new Date(lastLoadedMS).toLocaleTimeString() + " " + lastLoadTimeString + " " + nextOrderCompletionTime);
     console.log("Refresh timer: " + parseDelayRefreshPagina(refreshDelay));
 
@@ -377,6 +377,7 @@ function parseFromStringToMs(time){
 
 function getRefreshDelay(lastLoadTime, nextBuildFinishTime) {
     if (nextBuildFinishTime == "") return delayRefreshPagina;
+    if (!refreshWithBuildDuration) return delayRefreshPagina;
 
     var lastLoadTimeMs = parseFromStringToMs(lastLoadTime);
     var nextBuildFinishTimeMs = parseFromStringToMs(nextBuildFinishTime);
