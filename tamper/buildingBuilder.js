@@ -332,7 +332,7 @@ function isQueueFull() {
 }
 
 function refresh() {
-    if ( alternarAldeia ) location.reload();
+    if ( !alternarAldeia || refreshNext) location.reload();
     else {
         $('.groupRight').click();
         $('.arrowRight').click();
