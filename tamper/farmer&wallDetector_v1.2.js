@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name farmer&wallDetector
 // @author Rodrygors
-// @version 1.1
+// @version 1.2
 // @grant Publico
 // @description Script que envia quantiade de tropas diferentes para farms cheios, vazios e com ou sem muralha. Discord: Rodrygors#5516
 // @match https://*/*screen=am_farm*
@@ -30,10 +30,18 @@ const delayRefreshPagina = 300000; // EXEMPLOS: 120000 = 2 mins || 300000 0 5 mi
 const isFullSend = 1; // 1 = Caso não tenha tropas para atacar com um modelo, tenta usar o outro.
 const activateModelCDistance = 0; // Distância a que o script vai tentar enviar ataques com o modelo C, ter em atenção que unidades estão selecionadas (difinir 0 para desativar modelo C)
 //DEFINIÇÕES DO DETETOR DE MURALHA:
-const maxWallLevel = 0; //Nivel máximo de muralha até ao qual é para atacar (definir como 20 para atacar todas)
+const maxWallLevel = 1; //Nivel máximo de muralha até ao qual é para atacar (definir como 20 para atacar todas)
 const maxWalledVillageDistance = 18; // Distância a partir da qual aldeias com muralha acima do nivel estipulado são apagadas do assistente (definir como 0 para apagar todas)
 //OUTRAS DEFINIÇÕES:
 const saveinfoToLS = 1; // 1 = Guarda informação no LocalStorage para ser utilizado por outros scripts (até agora guarda as coordenadas das aldeias não atacadas por terem muralha para serem usadas num script de praça de reunião)
+//troop buffre
+const spearBuffer = 0;
+const swordBuffer = 0;
+const axeBuffer = 0;
+const scoutBuffer = 0;
+const lightBuffer = 0;
+const heavyBuffer = 0;
+const knightBuffer = 0;
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
 const safetyRefreshBuffer = 2000;
 const PARTIAL_PLUNDER = "Saque parcial: os seus soldados saquearam tudo que encontraram.";
@@ -96,22 +104,22 @@ function checkTroops(typeOfAttack){
 
 
     if(typeOfAttack=='A') {
-        return (modelSpearA <= currentSpear &&
-                modelSwordA <= currentSword &&
-                modelAxeA <= currentAxe &&
-                modelScoutA <= currentScout &&
-                modelLightA <= currentLight &&
-                modelHeavyA <= currentHeavy &&
-                modelKnightA <= currentKnight);
+        return (modelSpearA <= currentSpear - spearBuffer &&
+                modelSwordA <= currentSword - swordBuffer &&
+                modelAxeA <= currentAxe - axeBuffer &&
+                modelScoutA <= currentScout - scoutBuffer &&
+                modelLightA <= currentLight - lightBuffer &&
+                modelHeavyA <= currentHeavy - heavyBuffer &&
+                modelKnightA <= currentKnight - knightBuffer);
     }
     else if(typeOfAttack=='B') {
-        return (modelSpearB <= currentSpear &&
-                modelSwordB <= currentSword &&
-                modelAxeB <= currentAxe &&
-                modelScoutB <= currentScout &&
-                modelLightB <= currentLight &&
-                modelHeavyB <= currentHeavy &&
-                modelKnightB <= currentKnight);
+        return (modelSpearB <= currentSpear - spearBuffer &&
+                modelSwordB <= currentSword - swordBuffer &&
+                modelAxeB <= currentAxe - axeBuffer &&
+                modelScoutB <= currentScout - scoutBuffer &&
+                modelLightB <= currentLight - lightBuffer &&
+                modelHeavyB <= currentHeavy - heavyBuffer &&
+                modelKnightB <= currentKnight - knightBuffer);
     }
 }
 
