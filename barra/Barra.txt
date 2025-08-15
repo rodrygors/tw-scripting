@@ -1,0 +1,52 @@
+****************************************LEGAL****************************************
+	Atk Planner:
+		javascript:$.getScript('https://twscripts.dev/scripts/massAttackPlanner.js');
+		
+	Log de PP:
+		javascript:$.getScript("https://shinko-to-kuma.com/scripts/log.js");
+		
+	Limpar muralhas de bbs:
+		javascript:$.getScript('https://twscripts.dev/scripts/clearBarbarianWalls.js%27);
+
+	Remove do mapa todas as bbs que estejam no AF
+		javascript:$.getScript('https://gistcdn.githack.com/filipemiguel97/3361348fa4d3090bcdbff542fd92d43b/raw/hide_barbs_in_LA.js')
+		
+	Enviar recursos em massa:
+		javascript:$.getScript('https://shinko-to-kuma.com/scripts/res-senderV2.js');
+		
+	Redistribuir Recursos:
+		javascript: $.getScript("https://shinko-to-kuma.com/scripts/WHBalancerShinkoToKuma.js%22);
+
+	Tropas fora:
+		javascript: $.getScript("https://dl.dropbox.com/s/lhsaa538edi5xaz/support-counter.js");
+		
+	Support Counter & Support Remover(usar na aldeia apoiada):
+		javascript:$.getScript('https://twscripts.dev/scripts/supportCounterEvolved.js');
+		
+	Saber qts fulls aguenta:
+		javascript:$.getScript('https://twscripts.dev/scripts/defenseHealthCheck.js%27);
+		
+	Display Nivel Torre no mapa:
+		javascript:$.getScript('https://twscripts.dev/scripts/watchtowerEvolved.js%27);
+		
+	Mass Sender (planear fakes)
+		javascript:$.getScript('https://twscripts.dev/scripts/massCommandTimer.js%27);
+		
+	Renomear aldeias:
+		javascript:$.getScript('https://media.innogamescdn.com/com_DS_BR/Scripts/Aprovados/RenameVillages.js%27);
+		
+	Retirar coords do mapa:
+		javascript: function outputCoords() { var coordsOutput = ''; for (var i = 0; i < villages.length; i++) { if (villages[i] === null) { continue; } var realCount = 0; for (var j = 0; j <= i; j++) { if (villages[j] != null) { realCount++; } } coordsOutput += showWithCounter ? realCount + %27 - %27 : %27%27; coordsOutput += showIncluiID ? villagesId[i] + %27&%27 : %27%27; coordsOutput += showWithCoords ? %27[coord]%27 : %27%27; coordsOutput += villages[i]; coordsOutput += showWithCoords ? %27[/coord]%27 : %27%27; coordsOutput += (showQtdFulls && villagesFulls[i] != 0) ? %27 - %27 + villagesFulls[i] + %27 Fulls%27 : %27%27; coordsOutput += showIncluiID ? %27,%27 : %27%27; coordsOutput += showWithNewLine ? %27\n%27 : %27 %27; if (breakAfter != -1 && realCount % breakAfter == 0) { coordsOutput += %27\n%27; } } $(%27#output').html(coordsOutput); $('#output').select(); } var showQtdFulls = false; var showIncluiID = false; var showWithCoords = false; var showWithCounter = false; var showWithNewLine = true; var breakAfter = -1; var enabled = false; var villages = []; var villagesId = []; var villagesFulls = []; var oldClickFunction = null; if (game_data.screen != 'map') { UI.ErrorMessage('Este script deve ser executado a partir do mapa', 5000); } else { enabled = true; showWithCoords = window.showWithCoords; showWithCounter = window.showWithCounter; breakAfter = window.breakAfter; window.TWMap.mapHandler.integratedSpawnSector = window.TWMap.mapHandler.spawnSector; window.TWMap.mapHandler.spawnSector = function(data, sector) { window.TWMap.mapHandler.integratedSpawnSector(data, sector); for (var i = 0; i < villagesId.length; i++) { var villageId = villagesId[i]; if(villageId === null){ continue; } var v = $('#map_village_' + villageId); $('<div class=\"DSSelectVillagesOverlay\" id=\"DSSelectVillages_overlay_' + villageId + '\" style=\"width:52px; height:37px; position: absolute; z-index: 50; left:' + $(v).css('left') + '; top: ' + $(v).css('top') + ';\"></div>').appendTo(v.parent()); $('#DSSelectVillages_overlay_' + villageId).css('outline', 'rgba(51, 255, 0, 0.7) solid 2px').css('background-color', 'rgba(155, 252, 10, 0.14)'); } }; oldClickFunction = window.TWMap.mapHandler.onClick; window.TWMap.mapHandler.onClick = function(x, y, event) { var coord = x + '|' + y; var index = villages.indexOf(coord); var village = window.TWMap.villages[(x) * 1000 + y]; if (!village) { return false; } if (index === -1) { var numFulls = 0; if (showQtdFulls) { numFulls = prompt('Quantos fulls para a aldeia ' + coord); if (numFulls === null) { numFulls = 0; } } villages.push(coord); villagesId.push(village.id); villagesFulls.push(numFulls); $('#DSSelectVillages_overlay_' + village.id).css('outline', 'rgba(51, 255, 0, 0.7) solid 2px').css('background-color', 'rgba(155, 252, 10, 0.14)'); window.TWMap.reload(); } else { villages[index] = null; var indexId = villagesId.indexOf(village.id); villagesId[indexId] = null; villagesFulls[index] = null; $('#DSSelectVillages_overlay_' + village.id).css('outline', '').css('background-color', ''); } outputCoords(); return false; }; window.TWMap.reload(); $('#map_config').prepend( '<table id=\"bb_main_div\" class=\"vis\" style=\"border-spacing:0px;border-collapse:collapse;margin-top:15px;\" width=\"100%\"><tbody>' +'<tr><th colspan=\"3\">Aldeias selecionadas</th></tr>' +'<tr>' +' <td><input type=\"checkbox\" id=\"qtdFulls\"></td>' +' <td><label for=\"qtdFulls\">Quantidade fulls</label></td>' +'</tr>' +'<tr>' +' <td><input type=\"checkbox\" id=\"incluiID\"></td>' +' <td><label for=\"incluiID\">Incluir ID da aldeia</label></td>' +'</tr>' +'<tr>' +' <td><input type=\"checkbox\" id=\"bbcode\"></td>' +' <td><label for=\"bbcode\">Mostrar BBCodes</label></td>' +'</tr>' +'<tr>' +' <td><input type=\"checkbox\" id=\"contador\"></td>' +' <td><label for=\"contador\">Mostrar Contadores</label></td>' +'</tr>' +'<tr>' +' <td><input type=\"checkbox\" id=\"new-line\"></td>' +' <td><label for=\"new-line\">Mostrar por linhas</label></td>' +'</tr>' +'<tr><td></td>' +' <td><textarea id=\"output\" rows=\"5\" style=\"width:95%;\" readonly></textarea></td>' +'</tr>' +'</tbody></table>' ); var chkbxQtdFulls = $('#qtdFulls'); chkbxQtdFulls.prop('checked', showQtdFulls); chkbxQtdFulls.change(function () { showQtdFulls = this.checked; outputCoords(); }); var chkbxIncluiId = $('#incluiID'); chkbxIncluiId.prop('checked', showIncluiID); chkbxIncluiId.change(function () { showIncluiID = this.checked; outputCoords(); }); var chkbxBBcode = $('#bbcode'); chkbxBBcode.prop('checked', showWithCoords); chkbxBBcode.change(function () { showWithCoords = this.checked; outputCoords(); }); var chkbxcounter = $('#contador'); chkbxcounter.prop('checked', showWithCounter); chkbxcounter.change(function () { showWithCounter = this.checked; outputCoords(); }); var chkbxShowWithNewLine = $('#new-line'); chkbxShowWithNewLine.prop('checked', showWithNewLine); chkbxShowWithNewLine.change(function () { showWithNewLine = this.checked; outputCoords(); }); } void(0);
+		
+	Melhor aldeia para cunhar:
+		javascript:$.getScript('https://twscripts.dev/scripts/mintHelper.js%27);
+		
+	Report Notas:
+		javascript:$.getScript('https://dl.dropboxusercontent.com/s/mpir3x1wh36z2jn/scriptCriarNotaRelatorio.js?dl=0%27);void(0);
+****************************************MAYBE ILEGAL??***************************************
+
+	Auto atk bb no mapa:
+		javascript:$.getScript("https://gistcdn.githack.com/filipemiguel97/6acd34937d17043c8b96dbdb32e274e4/raw/mapFarm.js");
+		
+	Apoio em massa:	
+		javascript:var heavyCav=4;$.getScript('https://dl.dropboxusercontent.com/s/idwa7mmpn6nxl3l/supportSender.js?dl=0%27);void 0;
