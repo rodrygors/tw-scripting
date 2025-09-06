@@ -42,6 +42,8 @@ const scoutBuffer = 0;
 const lightBuffer = 0;
 const heavyBuffer = 0;
 const knightBuffer = 0;
+//world has archers?
+const archerOn = 1;
 //******************* NAO EDITAR ABAIXO DESTA LINHA *********************
 const safetyRefreshBuffer = 2000;
 const PARTIAL_PLUNDER = "Saque parcial: os seus soldados saquearam tudo que encontraram.";
@@ -75,51 +77,52 @@ function refresh() {
 
 function checkTroops(typeOfAttack){
     var modelSpearA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][3].value;
-    var modelSpearB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][12].value;
+    var modelSpearB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][12 + archerOn*2].value;
     var currentSpear = parseInt(document.getElementById("spear").lastChild.textContent);
 
     var modelSwordA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][4].value;
-    var modelSwordB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][13].value;
+    var modelSwordB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][13 + archerOn*2].value;
     var currentSword = parseInt(document.getElementById("sword").lastChild.textContent);
 
     var modelAxeA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][5].value;
-    var modelAxeB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][14].value;
+    var modelAxeB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][14 + archerOn*2].value;
     var currentAxe = parseInt(document.getElementById("axe").lastChild.textContent);
 
-    var modelScoutA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][6].value;
-    var modelScoutB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][15].value;
+    var modelScoutA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][6 + archerOn].value;
+    var modelScoutB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][15 + archerOn*3].value;
     var currentScout = parseInt(document.getElementById("spy").lastChild.textContent);
 
-    var modelLightA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][7].value;
-    var modelLightB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][16].value;
+    var modelLightA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][7 + archerOn].value;
+    var modelLightB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][16 + archerOn*3].value;
     var currentLight = parseInt(document.getElementById("light").lastChild.textContent);
 
-    var modelHeavyA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][8].value;
-    var modelHeavyB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][17].value;
+    var modelHeavyA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][8 + archerOn*2].value;
+    var modelHeavyB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][17 + archerOn*4].value;
     var currentHeavy = parseInt(document.getElementById("heavy").lastChild.textContent);
 
-    var modelKnightA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][9].value;
-    var modelKnightB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][18].value;
+    var modelKnightA = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][9 + archerOn*2].value;
+    var modelKnightB = document.getElementsByClassName("vis")[visIndexModel].children[1].children[0][18 + archerOn*4].value;
     var currentKnight = parseInt(document.getElementById("knight").lastChild.textContent);
 
+    console.log("cl a/b/current: " + modelLightA + " " + modelLightB + " " + currentLight);
 
     if(typeOfAttack=='A') {
-        return (modelSpearA <= currentSpear - spearBuffer &&
-                modelSwordA <= currentSword - swordBuffer &&
-                modelAxeA <= currentAxe - axeBuffer &&
-                modelScoutA <= currentScout - scoutBuffer &&
-                modelLightA <= currentLight - lightBuffer &&
-                modelHeavyA <= currentHeavy - heavyBuffer &&
-                modelKnightA <= currentKnight - knightBuffer);
+        return (modelSpearA <= (currentSpear - spearBuffer) &&
+                modelSwordA <= (currentSword - swordBuffer) &&
+                modelAxeA <= (currentAxe - axeBuffer) &&
+                modelScoutA <= (currentScout - scoutBuffer) &&
+                modelLightA <= (currentLight - lightBuffer) &&
+                modelHeavyA <= (currentHeavy - heavyBuffer) &&
+                modelKnightA <= (currentKnight - knightBuffer));
     }
     else if(typeOfAttack=='B') {
-        return (modelSpearB <= currentSpear - spearBuffer &&
-                modelSwordB <= currentSword - swordBuffer &&
-                modelAxeB <= currentAxe - axeBuffer &&
-                modelScoutB <= currentScout - scoutBuffer &&
-                modelLightB <= currentLight - lightBuffer &&
-                modelHeavyB <= currentHeavy - heavyBuffer &&
-                modelKnightB <= currentKnight - knightBuffer);
+        return (modelSpearB <= (currentSpear - spearBuffer) &&
+                modelSwordB <= (currentSword - swordBuffer) &&
+                modelAxeB <= (currentAxe - axeBuffer) &&
+                modelScoutB <= (currentScout - scoutBuffer) &&
+                modelLightB <= (currentLight - lightBuffer) &&
+                modelHeavyB <= (currentHeavy - heavyBuffer) &&
+                modelKnightB <= (currentKnight - knightBuffer));
     }
 }
 
@@ -217,7 +220,7 @@ function sendAttacks()
         if(!hasVillageToAttack); //Skip the first couple of rows that have no information
         else if( prevPlunderWallLevel > maxWallLevel ){
             coords = coords - checkWalls(prevPlunderWallLevel, prevPlunderDistance, clickIndex, coords);
-            //console.log("Lista de aldeias para destruir: " + window.localStorage.getItem('villagesToBeWalled'));
+            console.log("Lista de aldeias para destruir: " + window.localStorage.getItem('villagesToBeWalled'));
         }
         else if (statusModelA || statusModelB){
             //console.log(prevPlunderWallLevel + " > " + maxWallLevel + '?');
