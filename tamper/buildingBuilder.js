@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name buildingBuilder
 // @author Rodrygors
-// @version 1.0
+// @version 1.01
 // @grant Publico
 // @description Script que segue o in game toturial para os edificios, completa a construção mais rápido(free only) e completa as missões de pop up Discord: Rodrygors#5516
 // @match https://*/*&screen=main*
@@ -15,13 +15,15 @@
 //Other general improvements
 //27/07/25 -> v1.0
 //All major functionalities are working check "DEFINIÇÕES GERAIS" for more info
+//03/11/25 -> v1.01
+//Fixed bug with max level buildings and other small improvements
 //******************* EDITAR ABAIXO DESTA LINHA: *************************
 //DEFINIÇÕES GERAIS:
 const alternarAldeia = true; // false = Não muda de aldeia, e dá refresh após o tempo definido na variável delayRefreshPagina. // true = Muda de aldeia.
-const refreshWithBuildDuration = false; // true -> set refresh timer to match the missing timer on a build - 3 minutes (works best with alternarAldeia = false)
+const refreshWithBuildDuration = true; // true -> set refresh timer to match the missing timer on a build - 3 minutes (works best with alternarAldeia = false)
 //Builder modes have priority as bellow
 //If both questBuilderActive and resourcesBuilderActive are true, quest builds will be clicked before resources
-const questBuilderActive = true;
+const questBuilderActive = false;
 const resourcesBuilderActive = true;
 const quickFinishActive = true;
 const questFinisherActive = true;
@@ -101,7 +103,7 @@ window.addEventListener('load', async function() {
 
     var lastLoadTimeString = parseTimeFromPM(new Date(lastLoadedMS).toLocaleTimeString().split(" ").map(String));
     var refreshDelay = getRefreshDelay(lastLoadTimeString, nextOrderCompletionTime);
-    
+
     console.log(new Date(lastLoadedMS).toLocaleTimeString() + " " + lastLoadTimeString + " " + nextOrderCompletionTime);
     console.log("Refresh timer: " + parseDelayRefreshPagina(refreshDelay));
 
@@ -220,7 +222,10 @@ function dynamicButtonChooser3000() {
 
     for(var i=0; i<resourceBuildingRows.length; i++) {
         var buildingButton = getBuildingButtonFromRow(resourceBuildingRows[i]);
-        var currBuildingName = buildingButton.getAttribute("data-building")
+
+        if(buildingButton == null) continue;
+
+        var currBuildingName = buildingButton.getAttribute("data-building");
 
         //Check if building button is available
         if(isBuildingMaxedOut(resourceBuildingRows[i])) {
@@ -269,7 +274,9 @@ function dynamicButtonChooser3000() {
 }
 
 function getBuildingButtonFromRow(buildingRow) {
-    return document.querySelector(buildingRow).children[6].children[1];
+    var button = document.querySelector(buildingRow).children[6];
+    if (button == undefined || button == null) return null;
+    return button.children[1];
 }
 
 function getBuildQueueLength() {
