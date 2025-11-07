@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Coleta tudo caralho - CL
 // @version      0.5
-// @description  JeffTurbinator Edited.
+// @description  JeffTurbinator Edited. / Rodrygord Edited.
 // @author       LEOZAOCRLH
 // @include https://pt*.tribalwars.com.pt/*mode=scavenge*
 // @grant GM_setValue
@@ -21,6 +21,7 @@
     var refresh = 1;
     var podeClicar = 0;
     var retIntGlobal = 0;
+    var onlyDef = false;
 	unsafeWindow.window.name = tag;
 
     if (unsafeWindow.window.name === tag) {
@@ -64,14 +65,14 @@
         if (divisor > 0){
             var nrLanca = $("a.units-entry-all[data-unit='spear']")[0];
             var nrEspada = $("a.units-entry-all[data-unit='sword']")[0];
-            var nrMachado = $("a.units-entry-all[data-unit='axe']")[0];
+            if(!onlyDef) var nrMachado = $("a.units-entry-all[data-unit='axe']")[0];
             var nrArco = $("a.units-entry-all[data-unit='archer']")[0];
 
 
             if (divisor == 1){
                 nrLanca.click(); retIntGlobal = retIntGlobal + retornarInteiro($("a.units-entry-all[data-unit='spear']")[0].innerText,divisor);
                 nrEspada.click(); retIntGlobal = retIntGlobal + retornarInteiro($("a.units-entry-all[data-unit='sword']")[0].innerText,divisor);
-                nrMachado.click(); retIntGlobal = retIntGlobal + retornarInteiro($("a.units-entry-all[data-unit='axe']")[0].innerText,divisor);
+                if(!onlyDef) nrMachado.click(); retIntGlobal = retIntGlobal + retornarInteiro($("a.units-entry-all[data-unit='axe']")[0].innerText,divisor);
                 podeClicar = 4;
 
                 if (nrArco != undefined) {
@@ -85,12 +86,14 @@
                 var espada = document.getElementsByName("sword")[0];
                 espada.value = retornarInteiro($("a.units-entry-all[data-unit='sword']")[0].innerText,divisor); retIntGlobal = retIntGlobal + retornarInteiro($("a.units-entry-all[data-unit='sword']")[0].innerText,divisor);
                 espada.dispatchEvent(new KeyboardEvent('keyup',{'key':'0'}));
-                var machado = document.getElementsByName("axe")[0];
-                machado.value = retornarInteiro($("a.units-entry-all[data-unit='axe']")[0].innerText,divisor); retIntGlobal = retIntGlobal + retornarInteiro($("a.units-entry-all[data-unit='axe']")[0].innerText,divisor);
-                machado.dispatchEvent(new KeyboardEvent('keyup',{'key':'0'}));
+                if(!onlyDef){
+                    var machado = document.getElementsByName("axe")[0];
+                    machado.value = retornarInteiro($("a.units-entry-all[data-unit='axe']")[0].innerText,divisor); retIntGlobal = retIntGlobal + retornarInteiro($("a.units-entry-all[data-unit='axe']")[0].innerText,divisor);
+                    machado.dispatchEvent(new KeyboardEvent('keyup',{'key':'0'}));
+                }
                 if (nrArco != undefined) {
 	                var arco = document.getElementsByName("archer")[0];
-       	        arco.value = retornarInteiro($("a.units-entry-all[data-unit='archer']")[0].innerText,divisor);
+                    arco.value = retornarInteiro($("a.units-entry-all[data-unit='archer']")[0].innerText,divisor);
                 	arco.dispatchEvent(new KeyboardEvent('keyup',{'key':'0'}));
                 }
                 podeClicar = podeClicar + 1;
